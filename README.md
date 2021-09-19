@@ -1,11 +1,12 @@
-# RBE1001Lib
-A library to support introduction to robotics engineering. 
+# RBE-200n-Lib
+
+Forked from RBE1001Lib. This should be considered experimental.
 
 # Documentation by Doxygen
 
 [RBE1001Lib Doxygen](https://wpiroboticsengineering.github.io/RBE1001Lib/annotated.html)
 
-# Depenancies
+# Dependencies
 
 * ESP32Servo 0.9.0
 * ESP32AnalogRead 0.0.5
