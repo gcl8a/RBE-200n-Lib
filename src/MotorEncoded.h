@@ -11,11 +11,6 @@
 #include <MotorBase.h>
 #include <PIDcontroller.h>
 
-#define ENCODER_CPR 12.0f
-#define GEAR_BOX_RATIO 120.0f
-#define QUADRATURE_MULTIPLIER 1.0f
-#define TICKS_TO_DEGREES ((QUADRATURE_MULTIPLIER / (ENCODER_CPR * GEAR_BOX_RATIO / 360.0)) * -1)
-
 /** \brief A PID Motor class using FreeRTOS threads, ESP32Encoder and ESP32PWM
  *
  * This Motor class is intended to be used by RBE 1001 in the WPI Robotics Department.
@@ -31,7 +26,8 @@
  */
 class MotorEncoded : public MotorBase
 {
-
+	enum CTRL_MODE {CTRL_SPEED, CTRL_POS, CTRL_SPD_WITH_POS};
+	CTRL_MODE ctrlMode = CTRL_SPEED;
 private:
 	/**
 	 * ESP32Encoder object to keep track of the motors position
@@ -116,6 +112,7 @@ public:
 	 */
 
 	uint64_t resetEncoder(void) {return prevEncoder = currEncoder;}
+	uint64_t currTicksPerInterval = 0;
 
 private:
 	void process();

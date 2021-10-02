@@ -7,6 +7,11 @@
 
 #include <MotorEncoded.h>
 
+#define ENCODER_CPR 12.0f
+#define GEAR_BOX_RATIO 120.0f
+
+const float DEGREES_PER_TICK = 360.0 / (ENCODER_CPR * GEAR_BOX_RATIO);
+
 MotorEncoded::MotorEncoded(int pwmPin, int dirPin, int encAPin, int encBPin)
 	: MotorBase(pwmPin, dirPin), speedController(1)
 {
@@ -61,9 +66,10 @@ void MotorEncoded::setTargetDegreesPerSecond(float dps)
 		resetEncoder(); //avoids jumps when engaging control algorithm
 		motorState = MOTOR_CLOSED_LOOP_CTRL;
 	}
-	targetTicksPerInterval = dps * controlIntervalMS * 0.001 / TICKS_TO_DEGREES;
 
-//	closedLoopControl = true;
+	targetTicksPerInterval = dps * controlIntervalMS * 0.001 / DEGREES_PER_TICK;
+
+	ctrlMode = CTRL_SPEED;
 }
 
 /**
@@ -79,17 +85,20 @@ void MotorEncoded::process()
 
 	if(motorState == MOTOR_CLOSED_LOOP_CTRL)
 	{
-		if(++velocityLoopCounter >= controlIntervalMS)
+		if(ctrlMode == CTRL_SPEED)
 		{
-			velocityLoopCounter = 0;
+			if(++velocityLoopCounter >= controlIntervalMS)
+			{
+				velocityLoopCounter = 0;
 
-			float currSpeed = currEncoder - prevEncoder;
-			prevEncoder = currEncoder;
+				currTicksPerInterval = currEncoder - prevEncoder;
+				prevEncoder = currEncoder;
 
-			float error = targetTicksPerInterval - currSpeed;
-			float effort = speedController.ComputeEffort(error);
+				float error = targetTicksPerInterval - currTicksPerInterval;
+				float effort = speedController.ComputeEffort(error);
 
-			setEffortLocal(effort);
+				setEffortLocal(effort);
+			}
 		}
 	}
 }
@@ -102,11 +111,9 @@ void MotorEncoded::process()
  */
 float MotorEncoded::getDegreesPerSecond()
 {
-	float tmp = -999;
+	float ticksPerInterval = currTicksPerInterval;
 
-	//tmp = cachedSpeed;
-
-	return -tmp * TICKS_TO_DEGREES;
+	return ticksPerInterval * DEGREES_PER_TICK * (1000.0 / controlIntervalMS);
 }
 /**
  * getTicks
@@ -117,5 +124,5 @@ float MotorEncoded::getDegreesPerSecond()
 float MotorEncoded::getCurrentDegrees()
 {
 	float tmp = currEncoder;
-	return tmp * TICKS_TO_DEGREES;
+	return tmp * DEGREES_PER_TICK;
 }
