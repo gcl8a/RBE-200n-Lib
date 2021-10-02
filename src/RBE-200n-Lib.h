@@ -1,12 +1,12 @@
 #pragma once
 
-#include <Esp32WifiManager.h>
-#include <WebServer.h>
-#include <ESPmDNS.h>
-#include <ESP32AnalogRead.h>
+// #include <Esp32WifiManager.h>
+// #include <WebServer.h>
+// #include <ESPmDNS.h>
+// #include <ESP32AnalogRead.h>
 
-#include "Rangefinder.h"
-#include "Motor.h"
+// #include "Rangefinder.h"
+#include "MotorBase.h"
 
 // Pins used by a perpheral, may be re-used
 #define BOOT_FLAG_PIN 0
@@ -64,14 +64,14 @@
 #define MOTOR_RIGHT_ENCA 32
 #define MOTOR_RIGHT_ENCB 14
 
-class LeftMotor : public Motor
-{
-public:
-    LeftMotor() : Motor{MOTOR_LEFT_PWM, MOTOR_LEFT_DIR, MOTOR_LEFT_ENCA, MOTOR_LEFT_ENCB} {}
-};
+// class LeftMotor : public Motor
+// {
+// public:
+//     LeftMotor() : Motor{MOTOR_LEFT_PWM, MOTOR_LEFT_DIR, MOTOR_LEFT_ENCA, MOTOR_LEFT_ENCB} {}
+// };
 
-class RightMotor : public Motor
-{
-public:
-    RightMotor() : Motor{MOTOR_RIGHT_PWM, MOTOR_RIGHT_DIR, MOTOR_RIGHT_ENCA, MOTOR_RIGHT_ENCB} {}
-};
+// class RightMotor : public Motor
+// {
+// public:
+//     RightMotor() : Motor{MOTOR_RIGHT_PWM, MOTOR_RIGHT_DIR, MOTOR_RIGHT_ENCA, MOTOR_RIGHT_ENCB} {}
+// };
