@@ -19,16 +19,22 @@ MotorEncoded::~MotorEncoded()
 	encoder.pauseCount();
 }
 
-void MotorEncoded::attach(void)
+bool MotorEncoded::attach(void)
 {
-	MotorBase::attach();
-
-	if(!encodersEnabled)
+	if(MotorBase::attach())
 	{
-		encodersEnabled = true;
-		ESP32Encoder::useInternalWeakPullResistors = UP;
-		encoder.attachFullQuad(MotorEncAPin, MotorEncBPin);
+		if(!encodersEnabled)
+		{
+			encodersEnabled = true;
+			ESP32Encoder::useInternalWeakPullResistors = UP;
+			encoder.attachFullQuad(MotorEncAPin, MotorEncBPin);
+		}
+
+		return true;
 	}
+
+	// motor is not attached
+	return false;
 }	
 
 /**
@@ -50,6 +56,11 @@ void MotorEncoded::attach(void)
  */
 void MotorEncoded::setTargetDegreesPerSecond(float dps)
 {
+	if(motorState != MOTOR_CLOSED_LOOP_CTRL)
+	{
+		resetEncoder(); //avoids jumps when engaging control algorithm
+		motorState = MOTOR_CLOSED_LOOP_CTRL;
+	}
 	targetTicksPerInterval = dps * controlIntervalMS * 0.001 / TICKS_TO_DEGREES;
 
 //	closedLoopControl = true;
@@ -62,18 +73,24 @@ void MotorEncoded::setTargetDegreesPerSecond(float dps)
  */
 void MotorEncoded::process()
 {
-	if(++velocityLoopCounter >= controlIntervalMS)
+	//update the encoder regardless of whether or not we're going to perform control
+	//this prevents jumps when engaging control algorithms
+	currEncoder = encoder.getCount();
+
+	if(motorState == MOTOR_CLOSED_LOOP_CTRL)
 	{
-		velocityLoopCounter = 0;
+		if(++velocityLoopCounter >= controlIntervalMS)
+		{
+			velocityLoopCounter = 0;
 
-		currEncoder = encoder.getCount();
-		float currSpeed = currEncoder - prevEncoder;
-		prevEncoder = currEncoder;
+			float currSpeed = currEncoder - prevEncoder;
+			prevEncoder = currEncoder;
 
-		float error = targetTicksPerInterval - currSpeed;
-		float effort = speedController.ComputeEffort(error);
+			float error = targetTicksPerInterval - currSpeed;
+			float effort = speedController.ComputeEffort(error);
 
-		setEffortLocal(effort);
+			setEffortLocal(effort);
+		}
 	}
 }
 /**

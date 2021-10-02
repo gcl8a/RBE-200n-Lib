@@ -31,6 +31,9 @@ const float DELTA_EFFORT = 0.0025;
  */
 class MotorBase
 {
+protected:
+	enum MOTOR_STATE {MOTOR_UNATTACHED, MOTOR_DIRECT_CTRL, MOTOR_CLOSED_LOOP_CTRL};
+
 private:
 	/**
 	 * the object that produces PWM for motor speed
@@ -39,7 +42,12 @@ private:
 	/**
 	 * True if the motor has been attached
 	 */
-	bool isAttached = false;
+	//bool isAttached = false;
+
+protected:
+	MOTOR_STATE motorState = MOTOR_UNATTACHED;
+
+protected:
 	/*
 	 * effort of the motor
 	 * @param a value from -1 to 1 representing effort
@@ -48,18 +56,18 @@ private:
 	 *        -1 is full speed counter clockwise
 	 * @note this should only be called from the PID thread
 	 */
-protected:
 	void setEffortLocal(float effort);
+
+private:
 	/**
 	 * @param PWMgenerationTimer the timer to be used to generate the 20khz PWM
 	 */
-
-private:
 	static void allocateTimer(int PWMgenerationTimer);
 	/**
 	 * this is a flag to switch between using the PID controller, or allowing the user to set effort 'directly'
 	 *
 	 */
+
 	float targetEffort = 0;
 	/**
 	 * variable for caching the current effort being sent to the PWM/direction pins
@@ -112,7 +120,7 @@ public:
 	 */
 
 protected:
-	virtual void attach(void);
+	virtual bool attach(void);
 	/*
 	 *  \brief effort of the motor, proportional to PWM
 	 *

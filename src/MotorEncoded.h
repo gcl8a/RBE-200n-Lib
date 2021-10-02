@@ -31,7 +31,6 @@
  */
 class MotorEncoded : public MotorBase
 {
-	enum MOTOR_STATE {MOTOR_DISABLED, MOTOR_IDLE, MOTOR_DIRECT_CTRL, MOTOR_SPEED_CTRL};
 
 private:
 	/**
@@ -63,7 +62,7 @@ private:
 
 	PIDController speedController;
 
-	virtual void attach(void);
+	virtual bool attach(void);
 
 	bool encodersEnabled = false;
 
@@ -115,6 +114,8 @@ public:
 	 * this method is called by the timer to run the PID control of the motors and ensure strict timing
 	 *
 	 */
+
+	uint64_t resetEncoder(void) {return prevEncoder = currEncoder;}
 
 private:
 	void process();

@@ -81,31 +81,39 @@ void MotorBase::process(void)
 	setEffortLocal(currentEffort);
 }
 
-void MotorBase::attach(void)
+bool MotorBase::attach(void)
 {
-	if (isAttached)
-		return;
-	isAttached = true;
-	// Motor timer must be allocated and the thread must be started before starting
-	if (!MotorBase::timersAllocated)
+	if(motorState == MOTOR_UNATTACHED)
 	{
-		MotorBase::allocateTimer(0); // used by the DC Motors
-	}
-
-	pwm.attachPin(MotorPWMPin, 20000, 12);
-	pinMode(directionPin, OUTPUT);
-
-	// add the motor to the list of timer based controls
-	for (int i = 0; i < MAX_POSSIBLE_MOTORS; i++)
-	{
-		if (MotorBase::motorList[i] == NULL)
+		// Motor timer must be allocated and the thread must be started before starting
+		if (!MotorBase::timersAllocated)
 		{
-			//			String message ="Allocating Motor " + String(i) + " on PWM "+ String(MotorPWMPin);
-			//			ESP_LOGI(TAG,message.c_str());
-			MotorBase::motorList[i] = this;
-			return;
+			MotorBase::allocateTimer(0); // used by the DC Motors
 		}
+
+		// add the motor to the list of timer based controls
+		for (int i = 0; i < MAX_POSSIBLE_MOTORS; i++)
+		{
+			if (MotorBase::motorList[i] == NULL)
+			{
+				//			String message ="Allocating Motor " + String(i) + " on PWM "+ String(MotorPWMPin);
+				//			ESP_LOGI(TAG,message.c_str());
+				MotorBase::motorList[i] = this;
+
+				pwm.attachPin(MotorPWMPin, 20000, 12);
+				pinMode(directionPin, OUTPUT);
+
+				motorState = MOTOR_DIRECT_CTRL;
+
+				return true;
+			}
+		}
+
+		//failed to find open motor slot
+		return false;
 	}
+
+	return true;
 }
 
 /*
@@ -118,8 +126,9 @@ void MotorBase::attach(void)
  */
 void MotorBase::setEffort(float effort)
 {
-	if (!isAttached)
-		attach();
+	attach();
+
+	motorState = MOTOR_DIRECT_CTRL;
 
 	if (effort > 1)
 		effort = 1;
@@ -138,8 +147,7 @@ void MotorBase::setEffort(float effort)
  */
 float MotorBase::getEffort()
 {
-	if (!isAttached)
-		attach();
+	attach();
 	return currentEffort;
 }
 /*
@@ -151,8 +159,7 @@ float MotorBase::getEffort()
  */
 void MotorBase::setEffortLocal(float effort)
 {
-	if (!isAttached)
-		attach();
+	attach();
 
 	if (effort > 1)
 		effort = 1;
