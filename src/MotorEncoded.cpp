@@ -13,7 +13,7 @@
 const float DEGREES_PER_TICK = 360.0 / (ENCODER_CPR * GEAR_BOX_RATIO);
 
 MotorEncoded::MotorEncoded(int pwmPin, int dirPin, int encAPin, int encBPin)
-	: MotorBase(pwmPin, dirPin), speedController(1)
+	: MotorBase(pwmPin, dirPin), speedController(0.1)
 {
 	MotorEncAPin = encAPin;
 	MotorEncBPin = encBPin;
@@ -61,8 +61,11 @@ bool MotorEncoded::attach(void)
  */
 void MotorEncoded::setTargetDegreesPerSecond(float dps)
 {
+	attach();
+
 	if(motorState != MOTOR_CLOSED_LOOP_CTRL)
 	{
+		Serial.println("Resetting encoder");
 		resetEncoder(); //avoids jumps when engaging control algorithm
 		motorState = MOTOR_CLOSED_LOOP_CTRL;
 	}
@@ -79,6 +82,7 @@ void MotorEncoded::setTargetDegreesPerSecond(float dps)
  */
 void MotorEncoded::process()
 {
+	attach();
 	//update the encoder regardless of whether or not we're going to perform control
 	//this prevents jumps when engaging control algorithms
 	currEncoder = encoder.getCount();
@@ -97,10 +101,26 @@ void MotorEncoded::process()
 				float error = targetTicksPerInterval - currTicksPerInterval;
 				float effort = speedController.ComputeEffort(error);
 
-				setEffortLocal(effort);
+				// Serial.print('\n');
+				// Serial.print(currEncoder);
+				// Serial.print('\t');
+				// Serial.print(prevEncoder);
+				// Serial.print('\t');
+				// Serial.print(targetTicksPerInterval);
+				// Serial.print('\t');
+				// Serial.print(currTicksPerInterval);
+				// Serial.print('\t');
+				// Serial.print(error);
+				// Serial.print('\t');
+				// Serial.print(effort);
+				// Serial.print('\t');
+
+				setTargetEffort(effort);
 			}
 		}
 	}
+
+	MotorBase::process();
 }
 /**
  * getDegreesPerSecond
@@ -111,6 +131,8 @@ void MotorEncoded::process()
  */
 float MotorEncoded::getDegreesPerSecond()
 {
+	attach();
+	
 	float ticksPerInterval = currTicksPerInterval;
 
 	return ticksPerInterval * DEGREES_PER_TICK * (1000.0 / controlIntervalMS);
@@ -123,6 +145,8 @@ float MotorEncoded::getDegreesPerSecond()
  */
 float MotorEncoded::getCurrentDegrees()
 {
+	attach();
+
 	float tmp = currEncoder;
 	return tmp * DEGREES_PER_TICK;
 }

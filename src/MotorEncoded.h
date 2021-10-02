@@ -111,8 +111,8 @@ public:
 	 *
 	 */
 
-	uint64_t resetEncoder(void) {return prevEncoder = currEncoder;}
-	uint64_t currTicksPerInterval = 0;
+	int64_t resetEncoder(void) {return prevEncoder = currEncoder;}
+	int64_t currTicksPerInterval = 0;
 
 private:
 	void process();

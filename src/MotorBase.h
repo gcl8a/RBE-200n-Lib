@@ -130,6 +130,11 @@ protected:
 	 *        -1 is full speed counter clockwise
 	 */
 
+	void setTargetEffort(float effort)
+	{
+		targetEffort = effort;
+	}
+
 public:
 	void setEffort(float effort);
 	/*
@@ -165,8 +170,11 @@ public:
 
 private:
 	static void loop();
+
+protected:	
 	virtual void process(void);
 
+private:
 	friend void onMotorTimer(void* param);
 
 };

@@ -18,7 +18,7 @@ void onMotorTimer(void* param)
 	ESP_LOGI(TAG, "Starting the PID loop thread");
 	TickType_t xLastWakeTime;
 	xLastWakeTime = xTaskGetTickCount();
-    const TickType_t xInterval = 10;
+    const TickType_t xInterval = 1;
 	while(true)
 	{
 		vTaskDelayUntil(&xLastWakeTime, xInterval);
@@ -70,6 +70,8 @@ void MotorBase::loop()
 
 void MotorBase::process(void)
 {
+	attach();
+
 	if (targetEffort > currentEffort + DELTA_EFFORT)
 		currentEffort += DELTA_EFFORT;
 	else if (targetEffort < currentEffort - DELTA_EFFORT)
@@ -77,7 +79,6 @@ void MotorBase::process(void)
 	else
 		currentEffort = targetEffort;
 
-	// invert the effort so that the set speed and set effort match
 	setEffortLocal(currentEffort);
 }
 
@@ -135,7 +136,7 @@ void MotorBase::setEffort(float effort)
 	if (effort < -1)
 		effort = -1;
 	//portENTER_CRITICAL(&mmux);
-	targetEffort = effort;
+	setTargetEffort(effort);
 	//portEXIT_CRITICAL(&mmux);
 }
 /*
