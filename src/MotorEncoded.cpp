@@ -68,8 +68,8 @@ void MotorEncoded::process()
 		velocityLoopCounter = 0;
 
 		currEncoder = encoder.getCount();
-		float currSpeed = currEncoder - previousCount;
-		previousCount = currEncoder;
+		float currSpeed = currEncoder - prevEncoder;
+		prevEncoder = currEncoder;
 
 		float error = targetTicksPerInterval - currSpeed;
 		float effort = speedController.ComputeEffort(error);

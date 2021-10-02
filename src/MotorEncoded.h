@@ -49,7 +49,7 @@ private:
 	/*
 	 * this stores the previous count of the encoder last time the velocity was calculated
 	 */
-	int64_t previousCount = 0;
+	int64_t prevEncoder = 0;
 	/**
 	 * this variable is the most recently calculated speed
 	 */
