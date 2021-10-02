@@ -43,7 +43,7 @@ private:
 	uint32_t interruptCountForVelocity = 0;
 	/**
 	 * loop rate for this motor
-	 * timer loop is 1ms
+	 * timer loop is 1ms, so this value is in ms
 	 */
 	uint32_t processIntervalMS = 50;
 	/*
@@ -131,7 +131,4 @@ public:
 	void setTargetDegreesPerSecond(float dps);
 };
 
-//extern Motor left_motor;
-//extern Motor right_motor;
-
-#endif /* LIBRARIES_RBE1001LIB_SRC_MOTOR_H_ */
+#endif 
