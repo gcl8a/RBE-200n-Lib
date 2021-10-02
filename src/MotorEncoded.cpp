@@ -67,9 +67,9 @@ void MotorEncoded::process()
 	{
 		velocityLoopCounter = 0;
 
-		nowEncoder = encoder.getCount();
-		float currSpeed = nowEncoder - previousCount;
-		previousCount = nowEncoder;
+		currEncoder = encoder.getCount();
+		float currSpeed = currEncoder - previousCount;
+		previousCount = currEncoder;
 
 		float error = targetTicksPerInterval - currSpeed;
 		float effort = speedController.ComputeEffort(error);
@@ -100,6 +100,6 @@ float MotorEncoded::getDegreesPerSecond()
  */
 float MotorEncoded::getCurrentDegrees()
 {
-	float tmp = nowEncoder;
+	float tmp = currEncoder;
 	return tmp * TICKS_TO_DEGREES;
 }

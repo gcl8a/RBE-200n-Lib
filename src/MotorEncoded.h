@@ -78,7 +78,7 @@ public:
 	 * Variable to store the latest encoder read from the encoder hardware as read by the PID thread.
 	 * This variable is set inside the PID thread, and read outside.
 	 */
-	int64_t nowEncoder = 0;
+	int64_t currEncoder = 0;
 
 
 
