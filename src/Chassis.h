@@ -2,7 +2,7 @@
 #define __CHASSIS_H
 
 #include <RBE-200n-Lib.h>
-#include <MotorSpeed.h>
+#include <MotorEncoded.h>
 #include <event_timer.h>
 #include <button.h>
 
@@ -12,8 +12,8 @@ protected:
     enum ROBOT_STATE {ROBOT_IDLE, ROBOT_DRIVING, ROBOT_WALL_FOLLOWING, ROBOT_READOUT_SENSORS};
     ROBOT_STATE robot_state = ROBOT_IDLE;
 
-    MotorSpeedControl leftMotor;
-    MotorSpeedControl rightMotor;
+    MotorEncoded leftMotor;
+    MotorEncoded rightMotor;
 
 public:
     Robot(void);

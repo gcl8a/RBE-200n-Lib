@@ -5,7 +5,7 @@
  *      Author: hephaestus
  */
 
-#include <MotorSpeed.h>
+#include <MotorEncoded.h>
 
 bool MotorBase::timersAllocated = false;
 MotorBase* MotorBase::motorList[MAX_POSSIBLE_MOTORS] = {

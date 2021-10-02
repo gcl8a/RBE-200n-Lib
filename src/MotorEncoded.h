@@ -5,8 +5,8 @@
  *      Author: hephaestus
  */
 
-#ifndef LIBRARIES_RBE1001LIB_SRC_MOTOR_SPEED_H_
-#define LIBRARIES_RBE1001LIB_SRC_MOTOR_SPEED_H_
+#ifndef LIBRARIES_RBE1001LIB_SRC_MOTOR_ENCODED_H_
+#define LIBRARIES_RBE1001LIB_SRC_MOTOR_ENCODED_H_
 
 #include <MotorBase.h>
 #include <PIDcontroller.h>
@@ -29,7 +29,7 @@
  * must be called before any motor objects can be attached. This method will also start the PID thread.
  *
  */
-class MotorSpeedControl : public MotorBase
+class MotorEncoded : public MotorBase
 {
 private:
 	/**
@@ -95,8 +95,8 @@ public:
 	 * must be called before any motor objects can be attached. This method will also start the PID thread.
 	 *
 	 */
-	MotorSpeedControl(int pwmPin, int dirPin, int encAPin, int encBPin);
-	virtual ~MotorSpeedControl();
+	MotorEncoded(int pwmPin, int dirPin, int encAPin, int encBPin);
+	virtual ~MotorEncoded();
 	float getDegreesPerSecond();
 	/**
 	 * getTicks

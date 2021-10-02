@@ -5,22 +5,22 @@
  *      Author: hephaestus
  */
 
-#include <MotorSpeed.h>
+#include <MotorEncoded.h>
 
 
-MotorSpeedControl::MotorSpeedControl(int pwmPin, int dirPin, int encAPin, int encBPin)
+MotorEncoded::MotorEncoded(int pwmPin, int dirPin, int encAPin, int encBPin)
 	: MotorBase(pwmPin, dirPin), speedController(1)
 {
 	MotorEncAPin = encAPin;
 	MotorEncBPin = encBPin;
 }
 
-MotorSpeedControl::~MotorSpeedControl()
+MotorEncoded::~MotorEncoded()
 {
 	encoder.pauseCount();
 }
 
-void MotorSpeedControl::attach(void)
+void MotorEncoded::attach(void)
 {
 	MotorBase::attach();
 
@@ -49,7 +49,7 @@ void MotorSpeedControl::attach(void)
  *
  * @param newDegreesPerSecond the new speed in degrees per second
  */
-void MotorSpeedControl::setTargetDegreesPerSecond(float dps)
+void MotorEncoded::setTargetDegreesPerSecond(float dps)
 {
 	targetTicksPerInterval = dps * processIntervalMS * 0.001 / TICKS_TO_DEGREES;
 
@@ -61,7 +61,7 @@ void MotorSpeedControl::setTargetDegreesPerSecond(float dps)
  * this method is called by the timer to run the PID control of the motors and ensure strict timing
  *
  */
-void MotorSpeedControl::process()
+void MotorEncoded::process()
 {
 	if(++interruptCountForVelocity >= processIntervalMS)
 	{
@@ -84,7 +84,7 @@ void MotorSpeedControl::process()
  *
  * @return the speed of the motor in degrees per second
  */
-float MotorSpeedControl::getDegreesPerSecond()
+float MotorEncoded::getDegreesPerSecond()
 {
 	float tmp = -999;
 
@@ -98,7 +98,7 @@ float MotorSpeedControl::getDegreesPerSecond()
  * This function returns the current count of encoders
  * @return count
  */
-float MotorSpeedControl::getCurrentDegrees()
+float MotorEncoded::getCurrentDegrees()
 {
 	float tmp = nowEncoder;
 	return tmp * TICKS_TO_DEGREES;
