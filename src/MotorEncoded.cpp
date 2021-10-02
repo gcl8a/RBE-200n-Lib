@@ -51,7 +51,7 @@ void MotorEncoded::attach(void)
  */
 void MotorEncoded::setTargetDegreesPerSecond(float dps)
 {
-	targetTicksPerInterval = dps * processIntervalMS * 0.001 / TICKS_TO_DEGREES;
+	targetTicksPerInterval = dps * controlIntervalMS * 0.001 / TICKS_TO_DEGREES;
 
 //	closedLoopControl = true;
 }
@@ -63,7 +63,7 @@ void MotorEncoded::setTargetDegreesPerSecond(float dps)
  */
 void MotorEncoded::process()
 {
-	if(++velocityLoopCounter >= processIntervalMS)
+	if(++velocityLoopCounter >= controlIntervalMS)
 	{
 		velocityLoopCounter = 0;
 

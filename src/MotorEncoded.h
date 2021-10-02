@@ -45,7 +45,7 @@ private:
 	 * loop rate for this motor
 	 * timer loop is 1ms, so this value is in ms
 	 */
-	uint32_t processIntervalMS = 50;
+	uint32_t controlIntervalMS = 50;
 	/*
 	 * this stores the previous count of the encoder last time the velocity was calculated
 	 */
