@@ -33,14 +33,14 @@ class MotorEncoded : public MotorBase
 {
 private:
 	/**
-	 * the object that keeps track of the motors position
+	 * ESP32Encoder object to keep track of the motors position
 	 */
 	ESP32Encoder encoder;
 	/**
 	 * an internal counter that counts iterations of the PID loop
 	 * this is used to calculate N ms timing for calculation of the velocity
 	 */
-	uint32_t interruptCountForVelocity = 0;
+	uint32_t velocityLoopCounter = 0;
 	/**
 	 * loop rate for this motor
 	 * timer loop is 1ms, so this value is in ms

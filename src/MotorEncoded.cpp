@@ -63,9 +63,9 @@ void MotorEncoded::setTargetDegreesPerSecond(float dps)
  */
 void MotorEncoded::process()
 {
-	if(++interruptCountForVelocity >= processIntervalMS)
+	if(++velocityLoopCounter >= processIntervalMS)
 	{
-		interruptCountForVelocity = 0;
+		velocityLoopCounter = 0;
 
 		nowEncoder = encoder.getCount();
 		float currSpeed = nowEncoder - previousCount;

@@ -12,4 +12,5 @@ void Robot::loop(void)
 {
     delay(10);
     Serial.println(leftMotor.getDegreesPerSecond());
+    leftMotor.setTargetDegreesPerSecond(100);
 }
