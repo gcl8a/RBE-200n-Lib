@@ -110,6 +110,8 @@ public:
 	 * @note this must only be called after timers are allocated via Motor::allocateTimers(int PWMgenerationTimer)
 	 *
 	 */
+
+protected:
 	virtual void attach(void);
 	/*
 	 *  \brief effort of the motor, proportional to PWM
@@ -119,6 +121,8 @@ public:
 	 *        1 is full speed clockwise
 	 *        -1 is full speed counter clockwise
 	 */
+
+public:
 	void setEffort(float effort);
 	/*
 	 * effort of the motor
@@ -150,9 +154,13 @@ public:
 	{
 		return getEffort() * 100;
 	}
-	static void loop();
 
+private:
+	static void loop();
 	virtual void process(void);
+
+	friend void onMotorTimer(void* param);
+
 };
 
 #endif /* LIBRARIES_RBE1001LIB_SRC_MOTOR_H_ */

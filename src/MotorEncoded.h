@@ -31,6 +31,8 @@
  */
 class MotorEncoded : public MotorBase
 {
+	enum MOTOR_STATE {MOTOR_DISABLED, MOTOR_IDLE, MOTOR_DIRECT_CTRL, MOTOR_SPEED_CTRL};
+
 private:
 	/**
 	 * ESP32Encoder object to keep track of the motors position
@@ -65,7 +67,7 @@ private:
 
 	bool encodersEnabled = false;
 
-public:
+private:
 	/**
 	 * GPIO pin number of the motor encoder A
 	 */
@@ -95,8 +97,11 @@ public:
 	 * must be called before any motor objects can be attached. This method will also start the PID thread.
 	 *
 	 */
+
+public:
 	MotorEncoded(int pwmPin, int dirPin, int encAPin, int encBPin);
 	virtual ~MotorEncoded();
+
 	float getDegreesPerSecond();
 	/**
 	 * getTicks
@@ -110,6 +115,8 @@ public:
 	 * this method is called by the timer to run the PID control of the motors and ensure strict timing
 	 *
 	 */
+
+private:
 	void process();
 	/**
 	 * SetSpeed in degrees with time
@@ -128,6 +135,8 @@ public:
 	 *
 	 * @param newDegreesPerSecond the new speed in degrees per second
 	 */
+
+public:
 	void setTargetDegreesPerSecond(float dps);
 };
 

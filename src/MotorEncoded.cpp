@@ -7,7 +7,6 @@
 
 #include <MotorEncoded.h>
 
-
 MotorEncoded::MotorEncoded(int pwmPin, int dirPin, int encAPin, int encBPin)
 	: MotorBase(pwmPin, dirPin), speedController(1)
 {
