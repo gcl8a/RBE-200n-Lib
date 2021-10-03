@@ -14,6 +14,7 @@
 
 #define MAX_POSSIBLE_MOTORS 4
 
+//used to reduce jerk; set to a large number to deactivate
 const float DELTA_EFFORT = 0.0025;
 
 /** \brief A PID Motor class using FreeRTOS threads, ESP32Encoder and ESP32PWM
@@ -31,49 +32,6 @@ const float DELTA_EFFORT = 0.0025;
  */
 class MotorBase
 {
-protected:
-	//enum MOTOR_STATE {MOTOR_UNATTACHED, MOTOR_DIRECT_CTRL, MOTOR_CLOSED_LOOP_CTRL};
-
-private:
-	/**
-	 * the object that produces PWM for motor speed
-	 */
-	ESP32PWM pwm;
-	/**
-	 * True if the motor has been attached
-	 */
-	bool isAttached = false;
-
-protected:
-	//MOTOR_STATE motorState = MOTOR_UNATTACHED;
-
-private:
-	/*
-	 * effort of the motor
-	 * @param a value from -1 to 1 representing effort
-	 *        0 is brake
-	 *        1 is full speed clockwise
-	 *        -1 is full speed counter clockwise
-	 * @note this should only be called from the PID thread
-	 */
-	void setEffortLocal(float effort);
-
-private:
-	/**
-	 * @param PWMgenerationTimer the timer to be used to generate the 20khz PWM
-	 */
-	static void allocateTimer(int PWMgenerationTimer);
-	/**
-	 * this is a flag to switch between using the PID controller, or allowing the user to set effort 'directly'
-	 *
-	 */
-
-	float targetEffort = 0;
-	/**
-	 * variable for caching the current effort being sent to the PWM/direction pins
-	 */
-	float currentEffort = 0;
-
 private:
 	/**
 	 * GPIO pin number of the motor PWM pin
@@ -83,31 +41,24 @@ private:
 	 * GPIO pin number of the motor direction output flag
 	 */
 	int directionPin = -1;
-
-	static bool timersAllocated;
 	/**
-	 * This is a list of all of the Motor objects that have been attached. As a motor is attached,
-	 *  it adds itself to this list of Motor pointers. This list is read by the PID thread and each
-	 *  object in the list has loop() called.
-    */
-    
-	static MotorBase* motorList[MAX_POSSIBLE_MOTORS];
+	 * True if the motor has been attached
+	 */
+	bool isAttached = false;
+
+	float targetEffort = 0;
+	/**
+	 * variable for caching the current effort being sent to the PWM/direction pins
+	 */
+	float currentEffort = 0;
+
+	/**
+	 * the object that produces PWM for motor speed
+	 */
+	ESP32PWM pwm;
+
 
 public:
-
-	/** \brief A PID Motor class using FreeRTOS threads, ESP32Encoder and ESP32PWM
-	 *
-	 * This Motor class is intended to be used by RBE 1001 in the WPI Robotics Department.
-	 *
-	 * Motor objects can be instantiated statically. The attach method must be called before using the motor.
-	 *
-	 * The motor uses one timer for the ESP32PWM objects. That means the static method
-	 *
-	 * Motor::allocateTimer (int PWMgenerationTimer)
-	 *
-	 * must be called before any motor objects can be attached. This method will also start the PID thread.
-	 *
-	 */
 	MotorBase(int pwmPin, int dirPin);
 	virtual ~MotorBase();
 
@@ -119,6 +70,16 @@ public:
 	 *
 	 */
 
+private:
+	static bool timersAllocated;
+	/**
+	 * This is a list of all of the Motor objects that have been attached. As a motor is attached,
+	 *  it adds itself to this list of Motor pointers. This list is read by the PID thread and each
+	 *  object in the list has loop() called.
+    */
+    
+	static MotorBase* motorList[MAX_POSSIBLE_MOTORS];
+
 protected:
 	virtual bool attach(void);
 	/*
@@ -129,11 +90,6 @@ protected:
 	 *        1 is full speed clockwise
 	 *        -1 is full speed counter clockwise
 	 */
-
-	void setTargetEffort(float effort)
-	{
-		targetEffort = effort;
-	}
 
 public:
 	virtual void setEffort(float effort);
@@ -168,15 +124,33 @@ public:
 		return getEffort() * 100;
 	}
 
-private:
-	static void loop();
+protected:
 
-protected:	
+	void setTargetEffort(float effort)
+	{
+		targetEffort = effort;
+	}
+
 	virtual void process(void);
 
 private:
-	friend void onMotorTimer(void* param);
+	/*
+	 * effort of the motor
+	 * @param a value from -1 to 1 representing effort
+	 *        0 is brake
+	 *        1 is full speed clockwise
+	 *        -1 is full speed counter clockwise
+	 * @note this should only be called from the PID thread
+	 */
+	void setEffortLocal(float effort);
 
+	static void loop();
+	/**
+	 * @param PWMgenerationTimer the timer to be used to generate the 20khz PWM
+	 */
+	static void allocateTimer(int PWMgenerationTimer);
+
+	friend void onMotorTimer(void* param);
 };
 
-#endif /* LIBRARIES_RBE1001LIB_SRC_MOTOR_H_ */
+#endif 

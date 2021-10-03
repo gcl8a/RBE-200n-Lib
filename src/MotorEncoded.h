@@ -5,8 +5,8 @@
  *      Author: hephaestus
  */
 
-#ifndef LIBRARIES_RBE1001LIB_SRC_MOTOR_ENCODED_H_
-#define LIBRARIES_RBE1001LIB_SRC_MOTOR_ENCODED_H_
+#ifndef LIBRARIES_RBE200nLIB_SRC_MOTOR_ENCODED_H_
+#define LIBRARIES_RBE200nLIB_SRC_MOTOR_ENCODED_H_
 
 #include <MotorBase.h>
 #include <PIDcontroller.h>
@@ -26,9 +26,22 @@
  */
 class MotorEncoded : public MotorBase
 {
+protected:
 	enum CTRL_MODE {CTRL_DIRECT, CTRL_SPEED, CTRL_POS, CTRL_SPD_WITH_POS};
 	CTRL_MODE ctrlMode = CTRL_DIRECT;
+
 private:
+	/**
+	 * GPIO pin number of the motor encoder A
+	 */
+	int MotorEncAPin = -1;
+	/**
+	 * GPIO pin number of the motor encoder B
+	 */
+	int MotorEncBPin = -1;
+
+	bool encodersEnabled = false;
+
 	/**
 	 * ESP32Encoder object to keep track of the motors position
 	 */
@@ -43,78 +56,55 @@ private:
 	 * timer loop is 1ms, so this value is in ms
 	 */
 	uint32_t controlIntervalMS = 50;
-	/*
-	 * this stores the previous count of the encoder last time the velocity was calculated
-	 */
-	int64_t prevEncoder = 0;
-	/**
-	 * this variable is the most recently calculated speed
-	 */
-//	float cachedSpeed = 0;
-	/**
-	 * PID controller setpoint in encoder ticks
-	 */
-	float targetTicksPerInterval = 0;
-
-	PIDController speedController;
-
-	virtual bool attach(void);
-
-	bool encodersEnabled = false;
-
-private:
-	/**
-	 * GPIO pin number of the motor encoder A
-	 */
-	int MotorEncAPin = -1;
-	/**
-	 * GPIO pin number of the motor encoder B
-	 */
-	int MotorEncBPin = -1;
 	/**
 	 * Variable to store the latest encoder read from the encoder hardware as read by the PID thread.
 	 * This variable is set inside the PID thread, and read outside.
 	 */
 	int64_t currEncoder = 0;
-
-
-
-	/** \brief A PID Motor class using FreeRTOS threads, ESP32Encoder and ESP32PWM
-	 *
-	 * This Motor class is intended to be used by RBE 1001 in the WPI Robotics Department.
-	 *
-	 * Motor objects can be instantiated statically. The attach method must be called before using the motor.
-	 *
-	 * The motor uses one timer for the ESP32PWM objects. That means the static method
-	 *
-	 * Motor::allocateTimer (int PWMgenerationTimer)
-	 *
-	 * must be called before any motor objects can be attached. This method will also start the PID thread.
-	 *
+	/*
+	 * this stores the previous count of the encoder last time the velocity was calculated
 	 */
+	int64_t prevEncoder = 0;
+	/**
+	 * PID controller setpoint in encoder ticks
+	 */
+	float targetTicksPerInterval = 0; //really needs to be float?
+
+	int64_t currTicksPerInterval = 0;
+
+	PIDController speedController;
 
 public:
 	MotorEncoded(int pwmPin, int dirPin, int encAPin, int encBPin);
 	virtual ~MotorEncoded();
 
+	void setTargetDegreesPerSecond(float dps);
+
 	float getDegreesPerSecond();
-	/**
-	 * getTicks
-	 *
-	 * This function returns the current count of encoders
-	 * @return count
-	 */
+
 	float getCurrentDegrees();
-	/**
-	 * Loop function
-	 * this method is called by the timer to run the PID control of the motors and ensure strict timing
-	 *
-	 */
-
+	
 	int64_t resetEncoder(void) {return prevEncoder = currEncoder;}
-	int64_t currTicksPerInterval = 0;
 
-private:
+	void setEffort(float effort)
+	{
+		// when setEffort is called, we stop closed-loop control
+		ctrlMode = CTRL_DIRECT;
+
+		MotorBase::setEffort(effort);
+	}
+	
+	void setEffortPercent(float effort)
+	{
+		// when setEffort is called, we stop closed-loop control
+		ctrlMode = CTRL_DIRECT;
+
+		MotorBase::setEffortPercent(effort);
+	}
+
+protected:
+	virtual bool attach(void);
+
 	void process();
 	/**
 	 * SetSpeed in degrees with time
@@ -133,23 +123,6 @@ private:
 	 *
 	 * @param newDegreesPerSecond the new speed in degrees per second
 	 */
-
-public:
-	void setTargetDegreesPerSecond(float dps);
-	void setEffort(float effort)
-	{
-		// when setEffort is called, we stop closed-loop control
-		ctrlMode = CTRL_DIRECT;
-
-		MotorBase::setEffort(effort);
-	}
-	void setEffortPercent(float effort)
-	{
-		// when setEffort is called, we stop closed-loop control
-		ctrlMode = CTRL_DIRECT;
-
-		MotorBase::setEffortPercent(effort);
-	}
 };
 
 #endif 
