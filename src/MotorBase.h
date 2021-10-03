@@ -17,18 +17,15 @@
 //used to reduce jerk; set to a large number to deactivate
 const float DELTA_EFFORT = 0.0025;
 
-/** \brief A PID Motor class using FreeRTOS threads, ESP32Encoder and ESP32PWM
+/** \brief A PID Motor class using FreeRTOS threads, with pwm controlled by an ESP32PWM object.
  *
- * This Motor class is intended to be used by RBE 1001 in the WPI Robotics Department.
+ * The MotorBase class implements pwm for effort (including direction). Several methods are declared virtual
+ * and overridden by derived classes (currently just MotorEncoded).
  *
- * Motor objects can be instantiated statically. The attach method must be called before using the motor.
- *
- * The motor uses one timer for the ESP32PWM objects. That means the static method
- *
- * Motor::allocateTimer (int PWMgenerationTimer)
- *
- * must be called before any motor objects can be attached. This method will also start the PID thread.
- *
+ * The class uses one timer for all of the ESP32PWM objects, which is set up in allocateTimer().
+ * 
+ * When attached, motors are added to a list. loop() is called from the interrupt routine, which
+ * calls process() for each motor. process() is virtual; derived classes can implement their specific functionality.
  */
 class MotorBase
 {
@@ -37,16 +34,25 @@ private:
 	 * GPIO pin number of the motor PWM pin
 	 */
 	int MotorPWMPin = -1;
+
 	/**
 	 * GPIO pin number of the motor direction output flag
 	 */
 	int directionPin = -1;
+
 	/**
 	 * True if the motor has been attached
 	 */
 	bool isAttached = false;
 
+	/**
+	 * Hold the 'ideal' effort. The change in the actual effort (currentEffort) is limited to prevent jerk.
+	 * Somewhat experiemental. Set DELTA_EFFORT to a large value to disable, as that is what limits the change.
+	 * 
+	 * todo: clean this up or eliminate to avoid unintended consequences when tuning.
+	 */
 	float targetEffort = 0;
+
 	/**
 	 * variable for caching the current effort being sent to the PWM/direction pins
 	 */
@@ -57,18 +63,9 @@ private:
 	 */
 	ESP32PWM pwm;
 
-
 public:
 	MotorBase(int pwmPin, int dirPin);
 	virtual ~MotorBase();
-
-	/**
-	 * \brief Attach the motors hardware
-	 *
-	 * This attaches the motors to the hardware ports that were saved in the constructor
-	 * @note this must only be called after timers are allocated via Motor::allocateTimers(int PWMgenerationTimer)
-	 *
-	 */
 
 private:
 	static bool timersAllocated;
@@ -81,7 +78,17 @@ private:
 	static MotorBase* motorList[MAX_POSSIBLE_MOTORS];
 
 protected:
+	/**
+	 * \brief Setup of hardware and register the motor.
+	 *
+	 * This attaches the motors to the hardware ports that were saved in the constructor.
+	 * @note this must only be called after timers are allocated via Motor::allocateTimers(int PWMgenerationTimer)
+	 *
+	 * todo: verify/eliminate the note above
+	 */
 	virtual bool attach(void);
+
+public:
 	/*
 	 *  \brief effort of the motor, proportional to PWM
 	 *
@@ -90,11 +97,10 @@ protected:
 	 *        1 is full speed clockwise
 	 *        -1 is full speed counter clockwise
 	 */
-
-public:
 	virtual void setEffort(float effort);
+	
 	/*
-	 * effort of the motor
+	 * set the effort of the motor in percent
 	 * @param percent a value from -100 to 100 representing effort
 	 *        0 is brake
 	 *        100 is full speed clockwise
@@ -104,6 +110,7 @@ public:
 	{
 		setEffort(percent * 0.01);
 	}
+
 	/*
 	 * effort of the motor
 	 * @return a value from -1 to 1 representing effort
@@ -112,6 +119,7 @@ public:
 	 *        -1 is full speed counter clockwise
 	 */
 	float getEffort();
+
 	/*
 	 * effort of the motor
 	 * @return a value from -100 to 100 representing effort
@@ -124,21 +132,30 @@ public:
 		return getEffort() * 100;
 	}
 
+	// sets the motor so that positive is anti-clockwise
 	bool setReverse(bool rev = true) {return isReversed = rev;}
 
 protected:
 
 	bool isReversed = false;
 
+	/**
+	 * Sets the desired effort. The change in actual effort is restricted to avoid jerk.
+	 */
 	void setTargetEffort(float effort)
 	{
 		targetEffort = effort;
 	}
 
+	/**
+	 * Called from loop() for all motors in the motor list upon interupt (currently every ms).
+	 * Overridden by derived classes to implement control methods.
+	 */
 	virtual void process(void);
 
 private:
-	/*
+	/* Sets the nitty-gritty of the motor. Only called from process().
+
 	 * effort of the motor
 	 * @param a value from -1 to 1 representing effort
 	 *        0 is brake
@@ -148,7 +165,11 @@ private:
 	 */
 	void setEffortLocal(float effort);
 
+	/**
+	 * Called upon interrupt. Cycles through motors in motorList and calls process() for each.
+	 */
 	static void loop();
+	
 	/**
 	 * @param PWMgenerationTimer the timer to be used to generate the 20khz PWM
 	 */

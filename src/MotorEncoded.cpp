@@ -1,29 +1,43 @@
 /*
- * Motor.cpp
+ * MotorEncoded.cpp
  *
  *  Created on: May 31, 2020
  *      Author: hephaestus
+ * 
+ * 		Reorganzed by: gcl8a
  */
 
 #include <MotorEncoded.h>
 
+// todo: make these member data
 #define ENCODER_CPR 12.0f
 #define GEAR_BOX_RATIO 120.0f
 
 const float DEGREES_PER_TICK = 360.0 / (ENCODER_CPR * GEAR_BOX_RATIO);
 
+/**
+ * Constructor for an encoded motor that uses pwm and direction pins + quadrature encoder.
+ * 
+ * todo: create option for paired direction pins (eg, like the MC33926)
+ */
 MotorEncoded::MotorEncoded(int pwmPin, int dirPin, int encAPin, int encBPin)
-	: MotorBase(pwmPin, dirPin), speedController(0.1, 0.01)
+	: MotorBase(pwmPin, dirPin), speedController(0.1)
 {
 	MotorEncAPin = encAPin;
 	MotorEncBPin = encBPin;
 }
 
+/**
+ * Destructor pauses the encoder before removing object.
+ */
 MotorEncoded::~MotorEncoded()
 {
 	encoder.pauseCount();
 }
 
+/**
+ * Sets up the encoders and calls the base class attach (which registers the motor in the list)
+ */
 bool MotorEncoded::attach(void)
 {
 	if(MotorBase::attach())
@@ -43,21 +57,12 @@ bool MotorEncoded::attach(void)
 }	
 
 /**
- * setSpeed in degrees with time
- * Set the setpoint for the motor in degrees
- * This implements "Red Queen" mode running interpolation in the PID controller.
-
- "Now, here, you see, it takes all the running you can do, to keep in the same place.
-
- If you want to get somewhere else, you must run at least twice as fast as that!"
-
- — The Red Queen, Alice In Wonderland, Lewis Carroll
-
- * The way this velocity mode works is that the position target is moved forward every iteration of the PID
- * loop. The position runs away continuously, in order to keep the velocity stable.
- * A position increment is calculated, and added to the Position every 1ms of the loop()
- *
- * @param newDegreesPerSecond the new speed in degrees per second
+ * Sets the target speed in degrees/second.
+ * 
+ * If the motor is not currently speed controlled, it resets the encoder counts; otherwise
+ * there can be a jump in the motor since the error can be artificially large.
+ * 
+ * @param dps the new speed in degrees per second
  */
 void MotorEncoded::setTargetDegreesPerSecond(float dps)
 {
@@ -69,59 +74,63 @@ void MotorEncoded::setTargetDegreesPerSecond(float dps)
 		resetEncoder(); //avoids jumps when engaging control algorithm
 	}
 
+	// convert dps to ticks per control interval to avoid all the maths each time through the loop
 	targetTicksPerInterval = dps * controlIntervalMS * 0.001 / DEGREES_PER_TICK;
 
 	ctrlMode = CTRL_SPEED;
 }
 
 /**
- * Loop function
- * this method is called by the timer to run the PID control of the motors and ensure strict timing
+ * This method is called for each motor when it is time to perform control.
+ * 
+ * Currently, it only implements speed control.
+ * 
+ * todo: implement position control; implement speed control through position control (red queen)
  *
  */
 void MotorEncoded::process()
 {
+	// ensure that the motor is attached
 	attach();
+
 	//update the encoder regardless of whether or not we're going to perform control
-	//this prevents jumps when engaging control algorithms
+	//this prevents jumps when changing control algorithms
 	currEncoder = encoder.getCount();
 	if(isReversed) currEncoder *= -1;
 
-	// if(motorState == MOTOR_CLOSED_LOOP_CTRL)
-	// {
-		if(ctrlMode == CTRL_SPEED)
+	if(ctrlMode == CTRL_SPEED)
+	{
+		if(++velocityLoopCounter >= controlIntervalMS)
 		{
-			if(++velocityLoopCounter >= controlIntervalMS)
-			{
-				velocityLoopCounter = 0;
+			velocityLoopCounter = 0;
 
-				currTicksPerInterval = currEncoder - prevEncoder;
-				prevEncoder = currEncoder;
+			currTicksPerInterval = currEncoder - prevEncoder;
+			prevEncoder = currEncoder;
 
-				float error = targetTicksPerInterval - currTicksPerInterval;
-				float effort = speedController.ComputeEffort(error);
+			float error = targetTicksPerInterval - currTicksPerInterval;
+			float effort = speedController.ComputeEffort(error);
 
-				// Serial.print('\n');
-				// Serial.print(currEncoder);
-				// Serial.print('\t');
-				// Serial.print(prevEncoder);
-				// Serial.print('\t');
-				// Serial.print(targetTicksPerInterval);
-				// Serial.print('\t');
-				// Serial.print(currTicksPerInterval);
-				// Serial.print('\t');
-				// Serial.print(error);
-				// Serial.print('\t');
-				// Serial.print(effort);
-				// Serial.print('\t');
+			// Serial.print('\n');
+			// Serial.print(currEncoder);
+			// Serial.print('\t');
+			// Serial.print(prevEncoder);
+			// Serial.print('\t');
+			// Serial.print(targetTicksPerInterval);
+			// Serial.print('\t');
+			// Serial.print(currTicksPerInterval);
+			// Serial.print('\t');
+			// Serial.print(error);
+			// Serial.print('\t');
+			// Serial.print(effort);
+			// Serial.print('\t');
 
-				setTargetEffort(effort);
-			}
+			setTargetEffort(effort);
 		}
-//	}
+	}
 
 	MotorBase::process();
 }
+
 /**
  * getDegreesPerSecond
  *
@@ -131,22 +140,19 @@ void MotorEncoded::process()
  */
 float MotorEncoded::getDegreesPerSecond()
 {
-	//attach();
-	
 	float ticksPerInterval = currTicksPerInterval;
 
 	return ticksPerInterval * DEGREES_PER_TICK * (1000.0 / controlIntervalMS);
 }
+
 /**
- * getTicks
+ * getCurrentDegrees
  *
- * This function returns the current count of encoders
+ * This function returns the current position in degrees (since last encoder reset)
  * @return count
  */
 float MotorEncoded::getCurrentDegrees()
 {
-	//attach();
-
 	float tmp = currEncoder;
 	return tmp * DEGREES_PER_TICK;
 }
