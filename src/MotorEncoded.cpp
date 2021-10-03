@@ -100,19 +100,19 @@ void MotorEncoded::process()
 				float error = targetTicksPerInterval - currTicksPerInterval;
 				float effort = speedController.ComputeEffort(error);
 
-				Serial.print('\n');
-				Serial.print(currEncoder);
-				Serial.print('\t');
-				Serial.print(prevEncoder);
-				Serial.print('\t');
-				Serial.print(targetTicksPerInterval);
-				Serial.print('\t');
-				Serial.print(currTicksPerInterval);
-				Serial.print('\t');
-				Serial.print(error);
-				Serial.print('\t');
-				Serial.print(effort);
-				Serial.print('\t');
+				// Serial.print('\n');
+				// Serial.print(currEncoder);
+				// Serial.print('\t');
+				// Serial.print(prevEncoder);
+				// Serial.print('\t');
+				// Serial.print(targetTicksPerInterval);
+				// Serial.print('\t');
+				// Serial.print(currTicksPerInterval);
+				// Serial.print('\t');
+				// Serial.print(error);
+				// Serial.print('\t');
+				// Serial.print(effort);
+				// Serial.print('\t');
 
 				setTargetEffort(effort);
 			}
@@ -130,7 +130,7 @@ void MotorEncoded::process()
  */
 float MotorEncoded::getDegreesPerSecond()
 {
-	attach();
+	//attach();
 	
 	float ticksPerInterval = currTicksPerInterval;
 
@@ -144,7 +144,7 @@ float MotorEncoded::getDegreesPerSecond()
  */
 float MotorEncoded::getCurrentDegrees()
 {
-	attach();
+	//attach();
 
 	float tmp = currEncoder;
 	return tmp * DEGREES_PER_TICK;

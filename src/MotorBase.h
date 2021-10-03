@@ -47,7 +47,7 @@ private:
 protected:
 	//MOTOR_STATE motorState = MOTOR_UNATTACHED;
 
-protected:
+private:
 	/*
 	 * effort of the motor
 	 * @param a value from -1 to 1 representing effort

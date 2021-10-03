@@ -70,8 +70,6 @@ void MotorBase::loop()
 
 void MotorBase::process(void)
 {
-	attach();
-
 	if (targetEffort > currentEffort + DELTA_EFFORT)
 		currentEffort += DELTA_EFFORT;
 	else if (targetEffort < currentEffort - DELTA_EFFORT)
@@ -123,8 +121,6 @@ bool MotorBase::attach(void)
  */
 void MotorBase::setEffort(float effort)
 {
-	attach();
-
 	if (effort > 1)
 		effort = 1;
 	if (effort < -1)
@@ -141,7 +137,6 @@ void MotorBase::setEffort(float effort)
  */
 float MotorBase::getEffort()
 {
-	attach();
 	return currentEffort;
 }
 /*
