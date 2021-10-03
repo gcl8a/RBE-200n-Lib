@@ -53,8 +53,8 @@ MotorBase::~MotorBase()
 }
 
 /**
- * Loop function
- * this method is called by the timer to run the PID control of the motors and ensure strict timing
+ * loop() function
+ * this method is called by the timer to process() each motor and ensure strict timing.
  *
  */
 void MotorBase::loop()
@@ -68,6 +68,10 @@ void MotorBase::loop()
 	}
 }
 
+/**
+ * process a basic motor.
+ * sets the actual pwm level.
+ */
 void MotorBase::process(void)
 {
 	if (targetEffort > currentEffort + DELTA_EFFORT)
