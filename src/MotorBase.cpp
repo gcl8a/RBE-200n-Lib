@@ -84,7 +84,7 @@ void MotorBase::process(void)
 
 bool MotorBase::attach(void)
 {
-	if(motorState == MOTOR_UNATTACHED)
+	if(!isAttached)
 	{
 		// Motor timer must be allocated and the thread must be started before starting
 		if (!MotorBase::timersAllocated)
@@ -104,17 +104,13 @@ bool MotorBase::attach(void)
 				pwm.attachPin(MotorPWMPin, 20000, 12);
 				pinMode(directionPin, OUTPUT);
 
-				motorState = MOTOR_DIRECT_CTRL;
-
-				return true;
+				isAttached = true;
+				//motorState = MOTOR_DIRECT_CTRL;
 			}
 		}
-
-		//failed to find open motor slot
-		return false;
 	}
 
-	return true;
+	return isAttached;
 }
 
 /*
@@ -129,15 +125,12 @@ void MotorBase::setEffort(float effort)
 {
 	attach();
 
-	motorState = MOTOR_DIRECT_CTRL;
-
 	if (effort > 1)
 		effort = 1;
 	if (effort < -1)
 		effort = -1;
-	//portENTER_CRITICAL(&mmux);
+
 	setTargetEffort(effort);
-	//portEXIT_CRITICAL(&mmux);
 }
 /*
  * effort of the motor
@@ -170,6 +163,7 @@ void MotorBase::setEffortLocal(float effort)
 		digitalWrite(directionPin, LOW);
 	else
 		digitalWrite(directionPin, HIGH);
+
 	pwm.writeScaled(fabs(effort));
 }
 /**

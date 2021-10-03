@@ -26,8 +26,8 @@
  */
 class MotorEncoded : public MotorBase
 {
-	enum CTRL_MODE {CTRL_SPEED, CTRL_POS, CTRL_SPD_WITH_POS};
-	CTRL_MODE ctrlMode = CTRL_SPEED;
+	enum CTRL_MODE {CTRL_DIRECT, CTRL_SPEED, CTRL_POS, CTRL_SPD_WITH_POS};
+	CTRL_MODE ctrlMode = CTRL_DIRECT;
 private:
 	/**
 	 * ESP32Encoder object to keep track of the motors position
@@ -136,6 +136,20 @@ private:
 
 public:
 	void setTargetDegreesPerSecond(float dps);
+	void setEffort(float effort)
+	{
+		// when setEffort is called, we stop closed-loop control
+		ctrlMode = CTRL_DIRECT;
+
+		MotorBase::setEffort(effort);
+	}
+	void setEffortPercent(float effort)
+	{
+		// when setEffort is called, we stop closed-loop control
+		ctrlMode = CTRL_DIRECT;
+
+		MotorBase::setEffortPercent(effort);
+	}
 };
 
 #endif 

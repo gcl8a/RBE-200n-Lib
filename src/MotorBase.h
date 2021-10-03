@@ -32,7 +32,7 @@ const float DELTA_EFFORT = 0.0025;
 class MotorBase
 {
 protected:
-	enum MOTOR_STATE {MOTOR_UNATTACHED, MOTOR_DIRECT_CTRL, MOTOR_CLOSED_LOOP_CTRL};
+	//enum MOTOR_STATE {MOTOR_UNATTACHED, MOTOR_DIRECT_CTRL, MOTOR_CLOSED_LOOP_CTRL};
 
 private:
 	/**
@@ -42,10 +42,10 @@ private:
 	/**
 	 * True if the motor has been attached
 	 */
-	//bool isAttached = false;
+	bool isAttached = false;
 
 protected:
-	MOTOR_STATE motorState = MOTOR_UNATTACHED;
+	//MOTOR_STATE motorState = MOTOR_UNATTACHED;
 
 protected:
 	/*
@@ -136,7 +136,7 @@ protected:
 	}
 
 public:
-	void setEffort(float effort);
+	virtual void setEffort(float effort);
 	/*
 	 * effort of the motor
 	 * @param percent a value from -100 to 100 representing effort
@@ -144,7 +144,7 @@ public:
 	 *        100 is full speed clockwise
 	 *        -100 is full speed counter clockwise
 	 */
-	void setEffortPercent(float percent)
+	virtual void setEffortPercent(float percent)
 	{
 		setEffort(percent * 0.01);
 	}

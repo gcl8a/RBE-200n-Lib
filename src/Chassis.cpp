@@ -11,7 +11,7 @@ Robot::Robot(void) :
 void Robot::loop(void)
 {
     delay(100);
-    leftMotor.setTargetDegreesPerSecond(60);
+    leftMotor.setTargetDegreesPerSecond(30);
 
     Serial.print('\n');
     Serial.print(leftMotor.getCurrentDegrees());

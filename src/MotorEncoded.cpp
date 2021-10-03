@@ -13,7 +13,7 @@
 const float DEGREES_PER_TICK = 360.0 / (ENCODER_CPR * GEAR_BOX_RATIO);
 
 MotorEncoded::MotorEncoded(int pwmPin, int dirPin, int encAPin, int encBPin)
-	: MotorBase(pwmPin, dirPin), speedController(0.1)
+	: MotorBase(pwmPin, dirPin), speedController(0.1, 0.01)
 {
 	MotorEncAPin = encAPin;
 	MotorEncBPin = encBPin;
@@ -63,11 +63,10 @@ void MotorEncoded::setTargetDegreesPerSecond(float dps)
 {
 	attach();
 
-	if(motorState != MOTOR_CLOSED_LOOP_CTRL)
+	if(ctrlMode != CTRL_SPEED)
 	{
 		Serial.println("Resetting encoder");
 		resetEncoder(); //avoids jumps when engaging control algorithm
-		motorState = MOTOR_CLOSED_LOOP_CTRL;
 	}
 
 	targetTicksPerInterval = dps * controlIntervalMS * 0.001 / DEGREES_PER_TICK;
@@ -87,8 +86,8 @@ void MotorEncoded::process()
 	//this prevents jumps when engaging control algorithms
 	currEncoder = encoder.getCount();
 
-	if(motorState == MOTOR_CLOSED_LOOP_CTRL)
-	{
+	// if(motorState == MOTOR_CLOSED_LOOP_CTRL)
+	// {
 		if(ctrlMode == CTRL_SPEED)
 		{
 			if(++velocityLoopCounter >= controlIntervalMS)
@@ -101,24 +100,24 @@ void MotorEncoded::process()
 				float error = targetTicksPerInterval - currTicksPerInterval;
 				float effort = speedController.ComputeEffort(error);
 
-				// Serial.print('\n');
-				// Serial.print(currEncoder);
-				// Serial.print('\t');
-				// Serial.print(prevEncoder);
-				// Serial.print('\t');
-				// Serial.print(targetTicksPerInterval);
-				// Serial.print('\t');
-				// Serial.print(currTicksPerInterval);
-				// Serial.print('\t');
-				// Serial.print(error);
-				// Serial.print('\t');
-				// Serial.print(effort);
-				// Serial.print('\t');
+				Serial.print('\n');
+				Serial.print(currEncoder);
+				Serial.print('\t');
+				Serial.print(prevEncoder);
+				Serial.print('\t');
+				Serial.print(targetTicksPerInterval);
+				Serial.print('\t');
+				Serial.print(currTicksPerInterval);
+				Serial.print('\t');
+				Serial.print(error);
+				Serial.print('\t');
+				Serial.print(effort);
+				Serial.print('\t');
 
 				setTargetEffort(effort);
 			}
 		}
-	}
+//	}
 
 	MotorBase::process();
 }
