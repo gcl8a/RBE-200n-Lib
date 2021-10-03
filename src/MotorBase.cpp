@@ -8,9 +8,7 @@
 #include <MotorEncoded.h>
 
 bool MotorBase::timersAllocated = false;
-MotorBase* MotorBase::motorList[MAX_POSSIBLE_MOTORS] = {
-	NULL,
-};
+MotorBase* MotorBase::motorList[MAX_POSSIBLE_MOTORS] = {}; //initializes to NULL
 static TaskHandle_t complexHandlerTask;
 
 void onMotorTimer(void* param)
@@ -107,7 +105,6 @@ bool MotorBase::attach(void)
 				pinMode(directionPin, OUTPUT);
 
 				isAttached = true;
-				//motorState = MOTOR_DIRECT_CTRL;
 			}
 		}
 	}
