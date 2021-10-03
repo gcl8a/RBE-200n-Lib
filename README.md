@@ -2,6 +2,8 @@
 
 Forked from RBE1001Lib. This should be considered experimental.
 
+Everything in this readme is obsolete -- to be updated later.
+
 # Documentation by Doxygen
 
 [RBE1001Lib Doxygen](https://wpiroboticsengineering.github.io/RBE1001Lib/annotated.html)
