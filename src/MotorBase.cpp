@@ -150,6 +150,8 @@ void MotorBase::setEffortLocal(float effort)
 {
 	attach();
 
+	if(isReversed) effort *= -1;
+
 	if (effort > 1)
 		effort = 1;
 	if (effort < -1)
