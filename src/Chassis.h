@@ -6,6 +6,12 @@
 #include <event_timer.h>
 #include <button.h>
 
+/**
+ * WORK IN PROGRESS.
+ * 
+ * Nowhere near complete.
+ */
+
 class Robot
 {
 protected:
