@@ -85,6 +85,7 @@ void MotorEncoded::process()
 	//update the encoder regardless of whether or not we're going to perform control
 	//this prevents jumps when engaging control algorithms
 	currEncoder = encoder.getCount();
+	if(isReversed) currEncoder *= -1;
 
 	// if(motorState == MOTOR_CLOSED_LOOP_CTRL)
 	// {

@@ -46,8 +46,6 @@ private:
 	 */
 	bool isAttached = false;
 
-	bool isReversed = false;
-
 	float targetEffort = 0;
 	/**
 	 * variable for caching the current effort being sent to the PWM/direction pins
@@ -126,7 +124,11 @@ public:
 		return getEffort() * 100;
 	}
 
+	bool setReverse(bool rev = true) {return isReversed = rev;}
+
 protected:
+
+	bool isReversed = false;
 
 	void setTargetEffort(float effort)
 	{
