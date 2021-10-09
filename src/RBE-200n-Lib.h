@@ -37,41 +37,13 @@
 
 #define MOTOR_DISABLE 15
 
-/**
- * Drive motor 1 10Khz full duty PWM pin
- */
 #define MOTOR_LEFT_PWM 13
-/**
- * Pin for setting the direction of the H-Bridge
- */
-//A5
 #define MOTOR_LEFT_DIR 4
-/**
- * Drive motor 2 10Khz full duty PWM pin
- */
+#define MOTOR_LEFT_ENCA 26
+#define MOTOR_LEFT_ENCB 27
+
+
 #define MOTOR_RIGHT_PWM 12
-/**
- * Pin for setting the direction of the H-Bridge
- */
-//A1
 #define MOTOR_RIGHT_DIR 25
-//Encoder pins
-
-#define MOTOR_LEFT_ENCA 27
-//A0
-#define MOTOR_LEFT_ENCB 26
-
-#define MOTOR_RIGHT_ENCA 32
-#define MOTOR_RIGHT_ENCB 14
-
-// class LeftMotor : public Motor
-// {
-// public:
-//     LeftMotor() : Motor{MOTOR_LEFT_PWM, MOTOR_LEFT_DIR, MOTOR_LEFT_ENCA, MOTOR_LEFT_ENCB} {}
-// };
-
-// class RightMotor : public Motor
-// {
-// public:
-//     RightMotor() : Motor{MOTOR_RIGHT_PWM, MOTOR_RIGHT_DIR, MOTOR_RIGHT_ENCA, MOTOR_RIGHT_ENCB} {}
-// };
+#define MOTOR_RIGHT_ENCA 14
+#define MOTOR_RIGHT_ENCB 32

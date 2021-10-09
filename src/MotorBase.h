@@ -15,7 +15,7 @@
 #define MAX_POSSIBLE_MOTORS 4
 
 //used to reduce jerk; set to a large number to deactivate
-const float DELTA_EFFORT = 0.0025;
+const float DELTA_EFFORT = 0.05;
 
 /** \brief A PID Motor class using FreeRTOS threads, with pwm controlled by an ESP32PWM object.
  *

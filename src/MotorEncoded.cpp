@@ -21,7 +21,7 @@ const float DEGREES_PER_TICK = 360.0 / (ENCODER_CPR * GEAR_BOX_RATIO);
  * todo: create option for paired direction pins (eg, like the MC33926)
  */
 MotorEncoded::MotorEncoded(int pwmPin, int dirPin, int encAPin, int encBPin)
-	: MotorBase(pwmPin, dirPin), speedController(0.1)
+	: MotorBase(pwmPin, dirPin), speedController(0.02, 0.01, 0, 500)
 {
 	MotorEncAPin = encAPin;
 	MotorEncBPin = encBPin;
