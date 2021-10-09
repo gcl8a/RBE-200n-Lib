@@ -1,17 +1,15 @@
 #pragma once
 
-// #include <Esp32WifiManager.h>
-// #include <WebServer.h>
-// #include <ESPmDNS.h>
-// #include <ESP32AnalogRead.h>
-
-// #include "Rangefinder.h"
+//#include "Rangefinder.h"
 #include "MotorBase.h"
 
 // Pins used by a perpheral, may be re-used
 #define BOOT_FLAG_PIN 0
+
+// serial busses
 #define I2C_SDA 21
 #define I2C_SCL 22
+
 #define SERIAL_PROGRAMMING_TX 1
 #define SERIAL_PROGRAMMING_RX 3
 
@@ -24,24 +22,18 @@
 #define SIDE_ULTRASONIC_TRIG 16
 #define SIDE_ULTRASONIC_ECHO 17
 
-//A4
 #define LEFT_LINE_SENSE 36
-//A3
 #define RIGHT_LINE_SENSE 39
-//A2
-#define SERVO_FEEDBACK_SENSOR 34
-/**
- * Gripper pin for Servo
- */
-#define SERVO_PIN 33
 
-#define MOTOR_DISABLE 15
+#define SERVO_PIN 33
+#define SERVO_FEEDBACK_SENSOR 34
+
+#define MOTOR_DISABLE 15 //does this actually do anything?
 
 #define MOTOR_LEFT_PWM 13
 #define MOTOR_LEFT_DIR 4
 #define MOTOR_LEFT_ENCA 26
 #define MOTOR_LEFT_ENCB 27
-
 
 #define MOTOR_RIGHT_PWM 12
 #define MOTOR_RIGHT_DIR 25
