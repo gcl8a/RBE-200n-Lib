@@ -142,7 +142,7 @@ float MotorEncoded::getDegreesPerSecond()
 {
 	float ticksPerInterval = currTicksPerInterval;
 
-	return ticksPerInterval * DEGREES_PER_TICK * (1000.0 / controlIntervalMS);
+	return ticksPerInterval;// * DEGREES_PER_TICK * (1000.0 / controlIntervalMS);
 }
 
 /**
