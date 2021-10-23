@@ -1,11 +1,9 @@
 /*
- * Motor.h
+ * MotorEncoded.h
  *
- *  Created on: May 31, 2020
- *      Author: hephaestus
- * 
- * 		Reorganized by: gcl8a
+ * Author: Greg Lewin, adapted from original work by hephaestus
  */
+
 
 #ifndef LIBRARIES_RBE200nLIB_SRC_MOTOR_ENCODED_H_
 #define LIBRARIES_RBE200nLIB_SRC_MOTOR_ENCODED_H_
@@ -126,9 +124,8 @@ public:
 		MotorBase::setEffortPercent(effort);
 	}
 
-protected:
+public:
 	virtual bool attach(void);
-
 	virtual void process();
 };
 

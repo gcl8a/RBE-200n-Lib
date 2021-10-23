@@ -1,8 +1,7 @@
 /*
- * Motor.h
+ * MotorBase.h
  *
- *  Created on: May 31, 2020
- *      Author: hephaestus
+ * Author: Greg Lewin, adapted from original work by hephaestus
  */
 
 #ifndef LIBRARIES_RBE200nLIB_SRC_MOTOR_BASE_H_
@@ -12,20 +11,19 @@
 #include <ESP32Servo.h>
 #include <ESP32Encoder.h>
 
-#define MAX_POSSIBLE_MOTORS 4
-
-//used to reduce jerk; set to a large number to deactivate
+//used to reduce jerk; set to 1 to deactivate
+//experimental, at best; not recommended (it's not a good idea)
 const float DELTA_EFFORT = 1;
 
-/** \brief A PID Motor class using FreeRTOS threads, with pwm controlled by an ESP32PWM object.
+/** \brief A base class for motors, with pwm controlled by an ESP32PWM object.
  *
  * The MotorBase class implements pwm for effort (including direction). Several methods are declared virtual
  * and overridden by derived classes (currently just MotorEncoded).
  *
- * The class uses one timer for all of the ESP32PWM objects, which is set up in allocateTimer().
+ * The class uses one timer for all of the ESP32PWM objects, which is set up in Chassis.
  * 
- * When attached, motors are added to a list. loop() is called from the interrupt routine, which
- * calls process() for each motor. process() is virtual; derived classes can implement their specific functionality.
+ * process() is called from the interrupt routine for each motor. 
+ * process() is virtual; derived classes can implement their specific functionality.
  */
 class MotorBase
 {
@@ -66,16 +64,6 @@ private:
 public:
 	MotorBase(int pwmPin, int dirPin);
 	virtual ~MotorBase();
-
-private:
-	static bool timersAllocated;
-	/**
-	 * This is a list of all of the Motor objects that have been attached. As a motor is attached,
-	 *  it adds itself to this list of Motor pointers. This list is read by the PID thread and each
-	 *  object in the list has loop() called.
-    */
-    
-	static MotorBase* motorList[MAX_POSSIBLE_MOTORS];
 
 protected:
 	/**
@@ -148,7 +136,7 @@ protected:
 	}
 
 	/**
-	 * Called from loop() for all motors in the motor list upon interupt (currently every ms).
+	 * Called each time through the control loop (from Chassis)
 	 * Overridden by derived classes to implement control methods.
 	 */
 	virtual void process(void);
@@ -164,18 +152,6 @@ private:
 	 * @note this should only be called from the PID thread
 	 */
 	void setEffortLocal(float effort);
-
-	/**
-	 * Called upon interrupt. Cycles through motors in motorList and calls process() for each.
-	 */
-	static void loop();
-	
-	/**
-	 * @param PWMgenerationTimer the timer to be used to generate the 20khz PWM
-	 */
-	static void allocateTimer(int PWMgenerationTimer);
-
-	friend void onMotorTimer(void* param);
 };
 
 #endif 

@@ -1,11 +1,9 @@
 /*
  * MotorEncoded.cpp
  *
- *  Created on: May 31, 2020
- *      Author: hephaestus
- * 
- * 		Reorganzed by: gcl8a
+ * Author: Greg Lewin, adapted from original work by hephaestus
  */
+
 
 #include <MotorEncoded.h>
 

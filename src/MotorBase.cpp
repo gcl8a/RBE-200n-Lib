@@ -1,43 +1,10 @@
 /*
- * Motor.cpp
+ * MotorBase.cpp
  *
- *  Created on: May 31, 2020
- *      Author: hephaestus
+ * Author: Greg Lewin, adapted from original work by hephaestus
  */
 
 #include <MotorEncoded.h>
-
-bool MotorBase::timersAllocated = false;
-MotorBase* MotorBase::motorList[MAX_POSSIBLE_MOTORS] = {}; //initializes to NULL
-static TaskHandle_t complexHandlerTask;
-
-void onMotorTimer(void* param)
-{
-	ESP_LOGI(TAG, "Starting the PID loop thread");
-	TickType_t xLastWakeTime;
-	xLastWakeTime = xTaskGetTickCount();
-    const TickType_t xInterval = 1;
-	while(true)
-	{
-		vTaskDelayUntil(&xLastWakeTime, xInterval);
-		MotorBase::loop();
-	}
-	ESP_LOGE(TAG, "ERROR Pid thread died!");
-}
-/**
- * @param PWMgenerationTimer the timer to be used to generate the 20khx PWM
- * @param controllerTimer a timer for PID, velocity measurment, and trajectory planning
- */
-void MotorBase::allocateTimer(int PWMgenerationTimer)
-{
-	if (!MotorBase::timersAllocated)
-	{
-		//ESP32PWM::allocateTimer(PWMgenerationTimer);
-		xTaskCreatePinnedToCore(onMotorTimer, "PID loop Thread", 8192, NULL, 1,
-								&complexHandlerTask, 0);
-	}
-	MotorBase::timersAllocated = true;
-}
 
 MotorBase::MotorBase(int pwmPin, int dirPin)
 {
@@ -48,22 +15,6 @@ MotorBase::MotorBase(int pwmPin, int dirPin)
 MotorBase::~MotorBase()
 {
 	pwm.detachPin(MotorPWMPin);
-}
-
-/**
- * loop() function
- * this method is called by the timer to process() each motor and ensure strict timing.
- *
- */
-void MotorBase::loop()
-{		
-	for (int i = 0; i < MAX_POSSIBLE_MOTORS; i++)
-	{
-		if (MotorBase::motorList[i] != NULL)
-		{
-			MotorBase::motorList[i]->process();
-		}
-	}
 }
 
 /**
@@ -86,27 +37,10 @@ bool MotorBase::attach(void)
 {
 	if(!isAttached)
 	{
-		// Motor timer must be allocated and the thread must be started before starting
-		if (!MotorBase::timersAllocated)
-		{
-			MotorBase::allocateTimer(0); // used by the DC Motors
-		}
+		pwm.attachPin(MotorPWMPin, 20000, 12);
+		pinMode(directionPin, OUTPUT);
 
-		// add the motor to the list of timer based controls
-		for (int i = 0; i < MAX_POSSIBLE_MOTORS; i++)
-		{
-			if (MotorBase::motorList[i] == NULL)
-			{
-				//			String message ="Allocating Motor " + String(i) + " on PWM "+ String(MotorPWMPin);
-				//			ESP_LOGI(TAG,message.c_str());
-				MotorBase::motorList[i] = this;
-
-				pwm.attachPin(MotorPWMPin, 20000, 12);
-				pinMode(directionPin, OUTPUT);
-
-				isAttached = true;
-			}
-		}
+		isAttached = true;
 	}
 
 	return isAttached;
@@ -129,6 +63,7 @@ void MotorBase::setEffort(float effort)
 
 	setTargetEffort(effort);
 }
+
 /*
  * effort of the motor
  * @return a value from -1 to 1 representing effort
@@ -140,6 +75,7 @@ float MotorBase::getEffort()
 {
 	return currentEffort;
 }
+
 /*
  * effort of the motor
  * @param effort a value from -1 to 1 representing effort
@@ -149,25 +85,19 @@ float MotorBase::getEffort()
  */
 void MotorBase::setEffortLocal(float effort)
 {
-	attach();
+	if(attach()) //returns true if already attached or if attached in the method
+	{
+		if(isReversed) effort *= -1;
 
-	if(isReversed) effort *= -1;
+		if (effort > 1)
+			effort = 1;
+		if (effort < -1)
+			effort = -1;
+		if (effort > 0)
+			digitalWrite(directionPin, LOW);
+		else
+			digitalWrite(directionPin, HIGH);
 
-	if (effort > 1)
-		effort = 1;
-	if (effort < -1)
-		effort = -1;
-	if (effort > 0)
-		digitalWrite(directionPin, LOW);
-	else
-		digitalWrite(directionPin, HIGH);
-
-	pwm.writeScaled(fabs(effort));
+		pwm.writeScaled(fabs(effort));
+	}
 }
-/**
- * getDegreesPerSecond
- *
- * This function returns the current speed of the motor
- *
- * @return the speed of the motor in degrees per second
- */
