@@ -25,8 +25,18 @@ public:
 
     void init(void);
     void loop(void);
-
 };
+
+/*
+ * We declare an extern chassis. This will let the compiler know that there exists
+ * an object names chassis, which can now be addressed from global (static) constructs.
+ * It's similar to declaring a static object.
+ * 
+ * Using an extern (or a static member, for that matter) avoids declaring static
+ * member functions (note that there are no static functions in Chassis). In 
+ * principle, then, you could declare another Chassis object, which is pointless
+ * here, but useful for, say, multiple rangefinders and so forth.
+ */
 
 extern Chassis chassis;
 
