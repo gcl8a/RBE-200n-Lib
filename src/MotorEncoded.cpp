@@ -7,12 +7,6 @@
 
 #include <MotorEncoded.h>
 
-// todo: make these member data
-#define ENCODER_CPR 12.0f
-#define GEAR_BOX_RATIO 120.0f
-
-const float DEGREES_PER_TICK = 360.0 / (ENCODER_CPR * GEAR_BOX_RATIO);
-
 /**
  * Constructor for an encoded motor that uses pwm and direction pins + quadrature encoder.
  * 
@@ -23,6 +17,8 @@ MotorEncoded::MotorEncoded(int pwmPin, int dirPin, int encAPin, int encBPin)
 {
 	MotorEncAPin = encAPin;
 	MotorEncBPin = encBPin;
+
+	degreesPerTick = 360.0 / (encoderCountsPerMotorRev * gearSpeedRatio);
 }
 
 /**
@@ -73,7 +69,7 @@ void MotorEncoded::setTargetDegreesPerSecond(float dps)
 	}
 
 	// convert dps to ticks per control interval to avoid all the maths each time through the loop
-	targetTicksPerInterval = dps * controlIntervalMS * 0.001 / DEGREES_PER_TICK;
+	targetTicksPerInterval = dps * controlIntervalMS * 0.001 / degreesPerTick;
 
 	ctrlMode = CTRL_SPEED;
 }
@@ -154,5 +150,5 @@ float MotorEncoded::getDegreesPerSecond()
 float MotorEncoded::getCurrentDegrees()
 {
 	float tmp = currEncoder;
-	return tmp * DEGREES_PER_TICK;
+	return tmp * degreesPerTick;
 }

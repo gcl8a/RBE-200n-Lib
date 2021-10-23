@@ -27,6 +27,12 @@ protected:
 	enum CTRL_MODE {CTRL_DIRECT, CTRL_SPEED, CTRL_POS, CTRL_SPD_WITH_POS};
 	CTRL_MODE ctrlMode = CTRL_DIRECT;
 
+	//for the Romi
+	float encoderCountsPerMotorRev = 12.0;
+	float gearSpeedRatio = 120.0;
+
+	float degreesPerTick = 0;
+
 private:
 	/**
 	 * GPIO pin number of the motor encoder A

@@ -5,7 +5,7 @@
 #include <MotorEncoded.h>
 
 /**
- * WORK IN PROGRESS.
+ * Chassis class
  */
 
 class Chassis
@@ -16,7 +16,7 @@ protected:
 
     bool timerAllocated = false;
     void allocateTimer(int PWMgenerationTimer);
-    void MotorHandler(void);
+    void motorHandler(void);
 
    	friend void onMotorTimer(void* param);
 
@@ -29,6 +29,9 @@ public:
     void stop(void) {setWheelSpeeds(0,0);}
 
     void setWheelSpeeds(float left, float right);
+
+    void setTwist(float u, float omega);    //implementation left to the student
+    void updatePose(void);                  //implementation left to the student
 };
 
 /*

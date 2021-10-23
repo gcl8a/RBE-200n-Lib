@@ -1,7 +1,7 @@
 #include "Chassis.h"
 
 /**
- * WORK IN PROGRESS
+ * Chassis class
  */
 
 static TaskHandle_t complexHandlerTask;
@@ -15,7 +15,7 @@ void onMotorTimer(void* param)
 	while(true)
 	{
 		vTaskDelayUntil(&xLastWakeTime, xInterval);
-		chassis.MotorHandler();
+		chassis.motorHandler();
 	}
 	ESP_LOGE(TAG, "ERROR Pid thread died!");
 }
@@ -34,12 +34,14 @@ void Chassis::allocateTimer(int PWMgenerationTimer)
 	timerAllocated = true;
 }
 
-void Chassis::MotorHandler(void)
+void Chassis::motorHandler(void)
 {
     if(!timerAllocated) allocateTimer(0);
 
     leftMotor.process();
     rightMotor.process();
+
+    //here's where you'll update the pose...
 }
 
 Chassis::Chassis(void) :
