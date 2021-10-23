@@ -41,7 +41,7 @@ void Chassis::motorHandler(void)
     leftMotor.process();
     rightMotor.process();
 
-    //here's where you'll update the pose...
+    //here's where you'll update the pose in Lab 2
 	//updatePose(leftMotor.getSpeed(), ...);
 }
 
