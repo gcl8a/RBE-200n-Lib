@@ -27,10 +27,10 @@ void Chassis::allocateTimer(int PWMgenerationTimer)
 {
 	if (!timerAllocated)
 	{
-		//ESP32PWM::allocateTimer(PWMgenerationTimer);
 		xTaskCreatePinnedToCore(onMotorTimer, "PID loop Thread", 8192, NULL, 1,
 								&complexHandlerTask, 0);
 	}
+
 	timerAllocated = true;
 }
 
@@ -41,7 +41,6 @@ void Chassis::MotorHandler(void)
     leftMotor.process();
     rightMotor.process();
 }
-
 
 Chassis::Chassis(void) :
     leftMotor(MOTOR_LEFT_PWM, MOTOR_LEFT_DIR, MOTOR_LEFT_ENCA, MOTOR_LEFT_ENCB),
