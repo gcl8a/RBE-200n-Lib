@@ -67,3 +67,9 @@ void Chassis::setWheelSpeeds(float left, float right)
     leftMotor.setTargetDegreesPerSecond(left);
     rightMotor.setTargetDegreesPerSecond(right);
 }
+
+void Chassis::setMotorEfforts(float left, float right) 
+{
+    leftMotor.setEffortPercent(left);
+    rightMotor.setEffortPercent(right);
+}

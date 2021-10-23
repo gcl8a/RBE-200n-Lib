@@ -29,6 +29,7 @@ public:
     void stop(void) {setWheelSpeeds(0,0);}
 
     void setWheelSpeeds(float left, float right);
+    void setMotorEfforts(float left, float right);
 
     void setTwist(float u, float omega);    //implementation left to the student
     void updatePose(void);                  //implementation left to the student
