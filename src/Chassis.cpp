@@ -42,6 +42,7 @@ void Chassis::motorHandler(void)
     rightMotor.process();
 
     //here's where you'll update the pose...
+	//updatePose(leftMotor.getSpeed(), ...);
 }
 
 Chassis::Chassis(void) :
