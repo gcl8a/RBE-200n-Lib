@@ -26,6 +26,8 @@ public:
     void init(void);
     void loop(void);
 
+    void stop(void) {setWheelSpeeds(0,0);}
+
     void setWheelSpeeds(float left, float right);
 };
 
