@@ -53,9 +53,15 @@ private:
 	ESP32Encoder encoder;
 
 	/**
-	 * Loop rate for this motor. 
+	 * Loop rate for this motor. The main timer loop is 1ms, so this value is in ms.
 	 */
-	uint32_t controlIntervalMS = 0;
+	uint32_t controlIntervalMS = 50;
+
+	/**
+	 * An internal counter that counts iterations of the main motor loop; it is compared to
+	 * controlIntervalMS so that the velocity PID runs on longer intervals.
+	 */
+	uint32_t velocityLoopCounter = 0;
 
 	/**
 	 * Variable to store the latest encoder read from the encoder hardware as read by the PID thread.
@@ -86,7 +92,7 @@ private:
 	PIDController speedController;
 
 public:
-	MotorEncoded(int pwmPin, int dirPin, int encAPin, int encBPin, uint32_t loopPeriodMS);
+	MotorEncoded(int pwmPin, int dirPin, int encAPin, int encBPin);
 	virtual ~MotorEncoded();
 
 	/**

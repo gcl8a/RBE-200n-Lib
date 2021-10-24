@@ -4,8 +4,6 @@
  * Chassis class
  */
 
-#define MOTOR_CTRL_PERIOD 50
-
 static TaskHandle_t complexHandlerTask;
 
 void onMotorTimer(void* param)
@@ -13,7 +11,7 @@ void onMotorTimer(void* param)
 	ESP_LOGI(TAG, "Starting the PID loop thread");
 	TickType_t xLastWakeTime;
 	xLastWakeTime = xTaskGetTickCount();
-    const TickType_t xInterval = MOTOR_CTRL_PERIOD;
+    const TickType_t xInterval = 1;
 	while(true)
 	{
 		vTaskDelayUntil(&xLastWakeTime, xInterval);
@@ -48,8 +46,8 @@ void Chassis::motorHandler(void)
 }
 
 Chassis::Chassis(void) :
-    leftMotor(MOTOR_LEFT_PWM, MOTOR_LEFT_DIR, MOTOR_LEFT_ENCA, MOTOR_LEFT_ENCB, MOTOR_CTRL_PERIOD),
-    rightMotor(MOTOR_RIGHT_PWM, MOTOR_RIGHT_DIR, MOTOR_RIGHT_ENCA, MOTOR_RIGHT_ENCB, MOTOR_CTRL_PERIOD)
+    leftMotor(MOTOR_LEFT_PWM, MOTOR_LEFT_DIR, MOTOR_LEFT_ENCA, MOTOR_LEFT_ENCB),
+    rightMotor(MOTOR_RIGHT_PWM, MOTOR_RIGHT_DIR, MOTOR_RIGHT_ENCA, MOTOR_RIGHT_ENCB)
 {
     
 }

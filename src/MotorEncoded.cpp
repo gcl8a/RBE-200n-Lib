@@ -4,6 +4,7 @@
  * Author: Greg Lewin, adapted from original work by hephaestus
  */
 
+
 #include <MotorEncoded.h>
 
 /**
@@ -11,14 +12,13 @@
  * 
  * todo: create option for paired direction pins (eg, like the MC33926)
  */
-MotorEncoded::MotorEncoded(int pwmPin, int dirPin, int encAPin, int encBPin, uint32_t loopPeriodMS)
+MotorEncoded::MotorEncoded(int pwmPin, int dirPin, int encAPin, int encBPin)
 	: MotorBase(pwmPin, dirPin), speedController(0.005, 0.001, 0, 0)
 {
 	MotorEncAPin = encAPin;
 	MotorEncBPin = encBPin;
 
 	degreesPerTick = 360.0 / (encoderCountsPerMotorRev * gearSpeedRatio);
-	controlIntervalMS = loopPeriodMS;
 }
 
 /**
@@ -60,7 +60,7 @@ bool MotorEncoded::attach(void)
  */
 void MotorEncoded::setTargetDegreesPerSecond(float dps)
 {
-	attach(); //shouldn't be needed
+	attach();
 
 	if(ctrlMode != CTRL_SPEED)
 	{
@@ -94,29 +94,34 @@ void MotorEncoded::process()
 
 	if(ctrlMode == CTRL_SPEED)
 	{
-		currTicksPerInterval = currEncoder - prevEncoder;
+		if(++velocityLoopCounter >= controlIntervalMS)
+		{
+			velocityLoopCounter = 0;
 
-		// Serial.print('\t');
-		// Serial.print(currEncoder);
-		// Serial.print('\t');
-		// Serial.print(prevEncoder);
+			currTicksPerInterval = currEncoder - prevEncoder;
 
-		prevEncoder = currEncoder;
+			// Serial.print('\t');
+			// Serial.print(currEncoder);
+			// Serial.print('\t');
+			// Serial.print(prevEncoder);
 
-		float error = targetTicksPerInterval - currTicksPerInterval;
-		float effort = speedController.ComputeEffort(error);
+			prevEncoder = currEncoder;
 
-		// Serial.print('\t');
-		// Serial.print(targetTicksPerInterval);
-		// Serial.print('\t');
-		// Serial.print(currTicksPerInterval);
-		// Serial.print('\t');
-		// Serial.print(error);
-		// Serial.print('\t');
-		// Serial.print(effort);
-		// Serial.print('\t');
+			float error = targetTicksPerInterval - currTicksPerInterval;
+			float effort = speedController.ComputeEffort(error);
 
-		setTargetEffort(effort);
+			// Serial.print('\t');
+			// Serial.print(targetTicksPerInterval);
+			// Serial.print('\t');
+			// Serial.print(currTicksPerInterval);
+			// Serial.print('\t');
+			// Serial.print(error);
+			// Serial.print('\t');
+			// Serial.print(effort);
+			// Serial.print('\t');
+
+			setTargetEffort(effort);
+		}
 	}
 
 	MotorBase::process();
@@ -133,7 +138,7 @@ float MotorEncoded::getDegreesPerSecond()
 {
 	float ticksPerInterval = currTicksPerInterval;
 
-	return ticksPerInterval * degreesPerTick * (1000.0 / controlIntervalMS);
+	return ticksPerInterval;// * DEGREES_PER_TICK * (1000.0 / controlIntervalMS);
 }
 
 /**
